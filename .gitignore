@@ -1,0 +1,13 @@
+__pycache__
+VOCdevkit
+checkpoints
+.vscode
+*.pyc
+.idea/
+__pycache__
+results
+checkpoints_bak
+cityscapes
+results
+runs
+RZDG_real_seg

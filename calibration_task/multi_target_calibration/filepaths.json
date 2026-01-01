@@ -1,0 +1,13 @@
+{
+    "calibration_file_paths":{
+        "intrinsic_file_path": "/home/hitesh/Documents/Project/intrinsic_calibrations_of_camera/intrinsic_cam1.yaml",
+        "extrinic_calibrated_path": "/home/hitesh/Documents/Project/extrinsic_camera calibration_jsonfiles/extrinsic_cam1__.json",
+        "clicked_points": "/home/hitesh/Documents/Project/clicked points/clicked_points_cam2_CALIB.json",
+        "calibrated_json": "/home/hitesh/Documents/Project/error_calibrated_json_files/cam1_to_lidar.json"
+    },
+    "ros2_nodes":{
+        "camera_node": "/camera1/pylon_ros2_camera_node_camera1/image_raw",
+        "lidar_points_node": "/ouster/points",
+        "clicked_point":"/clicked_point"
+    }
+}

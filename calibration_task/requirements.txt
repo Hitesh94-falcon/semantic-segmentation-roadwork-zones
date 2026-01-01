@@ -1,0 +1,5 @@
+# Python packages (install via pip)
+numpy
+opencv-python
+cv-bridge
+

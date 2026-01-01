@@ -1,0 +1,4 @@
+# ROS 2 Python packages (install via your ROS 2 distribution / rosdep)
+rclpy
+sensor-msgs
+geometry-msgs

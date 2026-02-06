@@ -22,8 +22,8 @@ from utils.visualizer import Visualizer
 
 class Config:
     # Dataset
-    
-    data_root = '/home/hitesh/Documents/Project/semantic_segmentation/RZDG_real_seg'
+
+    data_root = os.getenv('DATA_ROOT', './RZDG_real_seg')
     num_classes = 3  # Change to 1 for binary segmentation
     
     # Model
@@ -33,12 +33,12 @@ class Config:
     separable_conv = False
     
     # Training
-    batch_size = 3
+    batch_size = 13
     num_workers = 2
-    learning_rate = 0.01
+    learning_rate = 0.001
     weight_decay = 1e-4
     momentum = 0.9
-    epochs = 50
+    epochs = 200
     total_itrs = 30000  # Total iterations
     
     # Augmentation

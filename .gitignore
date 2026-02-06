@@ -11,3 +11,8 @@ cityscapes
 results
 runs
 RZDG_real_seg
+colab_training
+results_*/
+*.txt
+*.ipynb
+extra

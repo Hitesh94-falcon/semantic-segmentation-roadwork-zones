@@ -1,48 +1,108 @@
-# Roadwork Zone Detection and Geo-localization (DeepLabV3+)
+# Roadwork Zone Semantic Segmentation (DeepLabV3+)
 
-A semantic segmentation system designed to detect and localize roadwork zone elements (Barriers and Road Beacons) using a custom DeepLabV3+ implementation.
+Semantic segmentation for roadwork-zone elements (Barrier and Road Beacon) using a custom DeepLabV3+ pipeline with a MobileNetV2 backbone.
 
-> **Attribution:** This project is adapted from the [DeepLabV3Plus-Pytorch](https://github.com/VainF/DeepLabV3Plus-Pytorch) repository by VainF.
+> Attribution: Adapted from [DeepLabV3Plus-Pytorch](https://github.com/VainF/DeepLabV3Plus-Pytorch) by VainF.
 
-## Project Overview
+## Highlights
 
-This system utilizes the DeepLabV3+ architecture with a MobileNetV2 backbone for efficient real-time segmentation of roadwork environments.
+- 3-class segmentation (Background, Barrier, Road Beacon)
+- TensorBoard logging for loss, accuracy, and mIoU
+- Visualization pipeline for masks and overlays
 
-### Key Features
-*   **Custom Training Pipeline:** Adapted for 3-class segmentation (Background, Barrier, Road Beacon).
-*   **Real-time Monitoring:** Integrated TensorBoard logging for loss, accuracy, and mIoU tracking.
-*   **Enhanced Visualization:** Custom prediction pipeline with:
-    *   Class-specific colormap (Red=Barrier, Yellow=Beacon).
-    *   Alpha-blended overlays for visual verification.
-    *   Automatic resizing to match original input resolution.
+## Result
 
-## Installation
+![Result GIF](results_310/result.gif)
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/Hitesh94-falcon/Roadwork-Zone-Detection-and-Geo-localization.git
-    cd Roadwork-Zone-Detection-and-Geo-localization
-    ```
+## Repository Layout
 
-2.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+- Training entrypoint: train.py
+- Inference entrypoint: predict.py
+- Model definitions: network/
+- Datasets: datasets/
+- Metrics: metrics/
+- Utilities: utils/
+- Logs: runs/
+- Checkpoints: checkpoints/
+- Results: results/
 
-## Usage
+## Requirements
 
-### Training
-To train the model on your custom dataset:
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Dataset Structure
+
+Expected layout (default):
+
+```
+RZDG_real_seg/
+    img_dir/
+        train/
+        val/
+    ann_dir/
+        train/
+        val/
+```
+
+Set the dataset root with the environment variable below, or edit the config class in train.py.
+
+## Configuration
+
+Key configuration options are inside `Config` in train.py and `PredictConfig` in predict.py.
+
+Environment variables (optional):
+
+- DATA_ROOT: dataset root directory (default: ./RZDG_real_seg)
+- PRETRAINED_MODEL_PATH: path to a pretrained backbone or model (default: ./checkpoints/best_deeplabv3plus_mobilenet_voc_os16.pth)
+
+## Training
+
+Start training:
+
 ```bash
 python train.py
 ```
-*   **Checkpoints:** Saved in `./checkpoints` (Best model + every 10 epochs).
-*   **Logs:** View real-time metrics with `tensorboard --logdir=./runs`.
 
-### Prediction
-To run inference on a folder of test images:
+Artifacts:
+
+- Checkpoints: ./checkpoints
+- Logs: ./runs (use TensorBoard)
+
+TensorBoard:
+
+```bash
+tensorboard --logdir=./runs
+```
+
+## Evaluation
+
+Compute mIoU on the validation set:
+
+```bash
+python extra/evaluate_miou.py
+```
+
+## Inference
+
+Run prediction on a folder of images:
+
 ```bash
 python predict.py
 ```
-*   **Output:** Results (Masks + Overlays) are saved in `./results`.
-*   **Configuration:** Adjust `PredictConfig` in `predict.py` to change input directories or model settings.
+
+Outputs:
+
+- Masks and overlays in ./results
+
+## Reproducibility Notes
+
+- Set `seed` values in train.py for deterministic behavior.
+- Confirm the same dataset split when comparing experiments.
+
+## Acknowledgements
+
+DeepLabV3Plus-Pytorch by VainF: https://github.com/VainF/DeepLabV3Plus-Pytorch

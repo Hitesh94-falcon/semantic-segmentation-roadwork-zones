@@ -10,6 +10,7 @@ import torch
 from PIL import Image
 import matplotlib
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from glob import glob
 from datasets import voc
 
@@ -21,11 +22,11 @@ class PredictConfig:
     model_name = 'deeplabv3plus_mobilenet'
     num_classes = 3
     output_stride = 16
-    checkpoint = '/home/hitesh/Documents/Project/semantic_segmentation/checkpoints/best_model.pth'
+    checkpoint = '/home/hitesh/Documents/Project/semantic_segmentation/checkpoints/best_model_250.pth'
     
     # Data
-    test_dir = './RZDG_real_seg/img_dir/test'
-    output_dir = './results'
+    test_dir = '/home/hitesh/Documents/Project/semantic_segmentation/RZDG_real_seg/img_dir/test'
+    output_dir = '/home/hitesh/Documents/Project/semantic_segmentation/results_250'
     
     # Hardware
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -74,9 +75,9 @@ def load_model(cfg):
     return model
 
 
-# ===========================
+
 # PREPROCESSING
-# ===========================
+
 def get_transform(image_size=513):
     """Get preprocessing transform"""
     return et.ExtCompose([
@@ -144,18 +145,29 @@ def visualize_result(original_img, pred_mask, colormap, output_path=None):
         plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
 
+
+def save_overlay_image(original_img, pred_mask, colormap, output_path, alpha=0.5):
+    """Save overlay image only"""
+    pred_colored = colormap[pred_mask]
+    overlay = (original_img * (1 - alpha) + pred_colored * alpha).astype(np.uint8)
+    Image.fromarray(overlay).save(output_path)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, default=None,
                         help="path to image or directory (default: test_dir from config)")
     parser.add_argument("--checkpoint", type=str, default=None,
                         help="path to checkpoint")
-    parser.add_argument("--output", type=str, default='./results',
+    parser.add_argument("--output", type=str, default=None,
                         help="output directory")
     parser.add_argument("--num_classes", type=int, default=3,
                         help="number of classes")
-    parser.add_argument("--visualize", action='store_true', default=True,
-                        help="save visualizations")
+    parser.add_argument("--masks", action='store_true', default=False,
+                        help="save prediction masks")
+    parser.add_argument("--visualize", action='store_true', default=False,
+                        help="save 3-panel visualization")
+    parser.add_argument("--overlay", action='store_true', default=False,
+                        help="save overlay image only")
     
     args = parser.parse_args()
     
@@ -170,8 +182,20 @@ def main():
     
     input_path = args.input if args.input else cfg.test_dir
     
-    # Create output directory
+    # Default behavior: if no output flags are set, save masks + visualization + overlay
+    if not (args.masks or args.visualize or args.overlay):
+        args.masks = True
+        args.visualize = True
+        args.overlay = True
+
+    # Create output directories
     os.makedirs(cfg.output_dir, exist_ok=True)
+    masks_dir = os.path.join(cfg.output_dir, 'masks')
+    vis_dir = os.path.join(cfg.output_dir, 'visualization')
+    overlay_dir = os.path.join(cfg.output_dir, 'overlay')
+    os.makedirs(masks_dir, exist_ok=True)
+    os.makedirs(vis_dir, exist_ok=True)
+    os.makedirs(overlay_dir, exist_ok=True)
     
     # Load model
     model = load_model(cfg)
@@ -200,22 +224,31 @@ def main():
     print("="*60)
     
     # Process images
-    for idx, img_path in enumerate(image_files, 1):
+    for idx, img_path in enumerate(tqdm(image_files, desc="Processing", unit="img"), 1):
         img_name = os.path.basename(img_path).split('.')[0]
         
         try:
-            # Predict
+            # Predict once
             original_img, pred_mask = predict_single_image(model, img_path, transform, cfg)
-            # Save prediction mask
-            pred_colored = Image.fromarray(colormap[pred_mask])
-            pred_path = os.path.join(cfg.output_dir, f'{img_name}_pred.png')
-            pred_colored.save(pred_path)
-            
-            
+
+            if args.overlay:
+                overlay_path = os.path.join(overlay_dir, f'{img_name}_overlay.png')
+                save_overlay_image(original_img, pred_mask, colormap, overlay_path)
+                # If overlay-only, skip other outputs unless explicitly requested
+                if not (args.masks or args.visualize):
+                    continue
+
+            if args.masks:
+                # Save prediction mask
+                pred_colored = Image.fromarray(colormap[pred_mask])
+                pred_path = os.path.join(masks_dir, f'{img_name}_pred.png')
+                pred_colored.save(pred_path)
+
             # Save visualization
             if args.visualize:
-                vis_path = os.path.join(cfg.output_dir, f'{img_name}_vis.png')
+                vis_path = os.path.join(vis_dir, f'{img_name}_vis.png')
                 visualize_result(original_img, pred_mask, colormap, vis_path)
+
                 
         
         except Exception as e:

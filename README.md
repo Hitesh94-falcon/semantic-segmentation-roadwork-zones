@@ -12,7 +12,7 @@ Semantic segmentation for roadwork-zone elements (Barrier and Road Beacon) using
 
 ## Result
 
-![Result GIF](results_310/result.gif)
+![Results](assets/result.gif)
 
 ## Repository Layout
 

@@ -22,11 +22,11 @@ class PredictConfig:
     model_name = 'deeplabv3plus_mobilenet'
     num_classes = 3
     output_stride = 16
-    checkpoint = '/home/hitesh/Documents/Project/semantic_segmentation/checkpoints/best_model_250.pth'
+    checkpoint = './checkpoints/best_model_250.pth'
     
     # Data
-    test_dir = '/home/hitesh/Documents/Project/semantic_segmentation/RZDG_real_seg/img_dir/test'
-    output_dir = '/home/hitesh/Documents/Project/semantic_segmentation/results_250'
+    test_dir = './RZDG_real_seg/img_dir/test'
+    output_dir = './results_250'
     
     # Hardware
     device = 'cuda' if torch.cuda.is_available() else 'cpu'

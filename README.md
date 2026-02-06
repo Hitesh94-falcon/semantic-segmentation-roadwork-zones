@@ -14,17 +14,6 @@ Semantic segmentation for roadwork-zone elements (Barrier and Road Beacon) using
 
 ![Results](assets/result.gif)
 
-## Repository Layout
-
-- Training entrypoint: train.py
-- Inference entrypoint: predict.py
-- Model definitions: network/
-- Datasets: datasets/
-- Metrics: metrics/
-- Utilities: utils/
-- Logs: runs/
-- Checkpoints: checkpoints/
-- Results: results/
 
 ## Requirements
 
